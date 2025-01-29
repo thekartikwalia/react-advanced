@@ -1,6 +1,7 @@
-# Component Tree Execution of Counter 
+# Component Tree of Counter 
 ```mermaid
 graph TD
     A[App] --> B[Counter]
-    A ---> C[CounterButton x2]
+    A[App] --> C[CounterButton x2]
+    A[App] --> D[SetCounter]
 ```
