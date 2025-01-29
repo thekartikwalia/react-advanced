@@ -1,4 +1,4 @@
-import { memo } from "react";
+// import { memo } from "react";
 
 // Way-1 of Optimisation (using "memo" to avoid unnecessary re-renders)
 
@@ -15,9 +15,14 @@ import { memo } from "react";
 // whose props aren't changing, but they're getting re-rendered 
 // unnecessarily due to re-rendering of their parent
 
-const Counter = memo(function Counter ({ count }) {
+// const Counter = memo(function Counter ({ count }) {
+//     console.log("COUNTER RENDERED");
+//     return <h1>Counter: {count}</h1>;
+// });
+
+function Counter ({ count }) {
     console.log("COUNTER RENDERED");
     return <h1>Counter: {count}</h1>;
-});
+}
 
 export default Counter;

@@ -2,11 +2,11 @@ import { useState } from "react";
 
 import Counter from "./components/Counter";
 import CounterButton from "./components/CounterButton";
+import SetCounter from "./components/SetCounter";
 
 function App() {
   console.log("APP RENDERED");
   const [count, setCount] = useState(0);
-  const [enteredCount, setEnteredCount] = useState(0);
 
   const handleIncrement = () => {
     setCount((prev) => prev + 1);
@@ -16,23 +16,20 @@ function App() {
     setCount((prev) => prev - 1);
   };
 
-  const handleEnteredCountChange = (event) => {
-    setEnteredCount(event.target.value);
+  const handleSetCount = (newCount) => {
+    setCount(newCount);
   };
+
+  // Way-2 (Structure your components in a way that you don't get stuck in unencessary Re-renders)
+  // Mai alag component bna sakta tha for this input, and iss state (enteredCount) ko usmei rakhta
+  // Better re-structuring of components & states to stop redundant rendering cycles
 
   return (
     <div>
       <Counter count={count} />
       <CounterButton onButtonClick={handleIncrement}>Increase</CounterButton>
       <CounterButton onButtonClick={handleDecrement}>Decrease</CounterButton>
-      <div>
-        <input
-          type="number"
-          value={enteredCount}
-          onChange={handleEnteredCountChange}
-        />
-        <button onClick={() => setCount(enteredCount)}>Set</button>
-      </div>
+      <SetCounter onSet={handleSetCount} />
     </div>
   );
 }
