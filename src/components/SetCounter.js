@@ -1,15 +1,11 @@
 import { useState } from "react";
 
-
-// Now when state (enteredCount) changes, only SetCounter gets re-rendered
-// So we optimised without use of "memo"
-
 const SetCounter = ({ onSet }) => {
     console.log("SET COUNTER RENDERED")
   const [enteredCount, setEnteredCount] = useState(0);
 
   const handleEnteredCountChange = (event) => {
-    setEnteredCount(event.target.value);
+    setEnteredCount(Number(event.target.value));
   };
 
   return (

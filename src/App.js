@@ -4,57 +4,17 @@ import Counter from "./components/Counter";
 import CounterButton from "./components/CounterButton";
 import SetCounter from "./components/SetCounter";
 
-// useMemo() tab use hota hai 
-// Jaise ki maanlo mere paas calc() karke ek function defined hota, 
-// jismei koi bhaari computation hora h
-// Maan lete hain ki koi ek state (state) aur hai, joki frequently change hori hai 
-// Aur uss frequently change ke karan, yeh App re-render hora, 
-// uske karan yeh calculatedCount re-render hora hai
-// calculatedCount re-render hora hai toh yeh calc() function baar re-render hora hai 
-
-function calc(count) {
-  // expensive calculation (matlab jo expensive on computation hai, jo zyada memory le)
-  // like prime check or whatever, depending upon use case 
-}
+// Instead of re-rendering whole JSX, react uses "Virtual DOM"
+// react maintains virtual DOM behind the scenes
+// react keeps 2 things with itself: old snapshot (real DOM) and virtual snapshot
+// react creates virtual snapshot via Component Tree Execution
+// As soon as page gets reloaded,
+// whereever react finds difference in it's virtual and real DOM, it updates that portion of DOM
+// React figures out state change with help of Virtual DOM
 
 function App() {
   console.log("APP RENDERED");
   const [count, setCount] = useState(0);
-  const [state, setState] = useState(null);    // chnages frequently, so re-renders App component 
-  // Toh yeh calculateCount faltu mei call hua na, iska toh na count change hua
-  // function vohi ka vohi hai, calculated count ki value vohi ki vohi hai 
-  // toh faaltu mei isko call kyu kar raha hun
-  // Aisi cheezon ko handle karne ke liye hota hai useMemo() hook
-
-  // If i wrap it with useMemo(), again takes 2 parameters -> function and dependencies
-  const calculatedCount = useMemo(() => calc(count), [count]);
-  // Ab useMemo() kya karega ?
-  // Voh kahega ki bhyii yeh function ko dekho and isko memorise karlo 
-  // matlab iska jo value hai voh calculatedCount ke ander daaldo
-  // aur jab yeh dependency array change ho tabhi isko call karna 
-  // jo iske ander function hai, tabhi expensive calculation karna, nahi toh mat karna 
-  
-  // Seedhi si baat haina ki bhyii hum dusri state change kar rahe hai, 
-  // toh count ki calculation dubara kyu karein
-  // Toh yahan pe dependency chahiye count, ki yeh tabhi re-calculate karo jab count change ho
-  // Baaki kuch aur change ho, agar state change ho toh mat re-calculate karlena isko
-
-  // Toh yeh tabhi re-render hoga jab mera count change hoga 
-  // Aur tabhi hum expensive calculation karenge
-
-  // Aise kaamo ke liye use hota hai useMemo()
-
-  // BRIEF COMPARISON OF useCallback() and useMemo()
-  // useCallback() tha ki jab tumhe function ki value re-create nahi karni (toh voh functions ko wrap kardeta hai)
-  // useMemo() mei tum kuch bhi wrap kar sakte ho, maanlo tumhare paas koi value hai jo tumhe baar baar nahi karni
-  // Most prupose of useMemo() hota hai expensive calculation ko rokna 
-
-  // Main difference is that useMemo returns a memoized value and useCallback returns a memoized function
-
-  // IMPORTANT THING! (Referential Equality)
-  // Every time a component re-renders, its functions get recreated.
-  // Due to Referential Equality, function passed as props to child component changes and "memo" doesn't works as expected
-  // That's where useCallback() hook comes in to prevent the function from being recreated unless necessary.
 
   const handleIncrement = useCallback(() => {
     setCount((prev) => prev + 1);
@@ -68,12 +28,43 @@ function App() {
     setCount(newCount);
   };
 
+  const arr = [1, 2, 3, 4];
+
   return (
     <div>
       <Counter count={count} />
       <CounterButton onButtonClick={handleIncrement}>Increase</CounterButton>
       <CounterButton onButtonClick={handleDecrement}>Decrease</CounterButton>
       <SetCounter onSet={handleSetCount} />
+      <SetCounter onSet={handleSetCount} />
+      {/* Dono setCounter ko set karne pe, count ki state change hori hai, but dono ki apni state hai */}
+      {/* Mai agar ek mei 0 ka 1 karunga, toh kya neche waale mei bhi 0 ka 1 hojayega kya ? 
+      Nahi hoga, iski state iski apni state hai, none of any other state */}
+
+      {/* Key point is even if i resuse the same component 2 times, snapshot of both will be different,
+      and react can figure it out all by itself */}
+
+      {/* But sometimes we need to tell react that how to figure out */}
+      <ul>
+        {arr.map((item, index) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+      {/* This gives a warning (in case of absence of key) that each child should have a unique key prop */}
+      {/* Iska matlab hai react ko samajh nhi aaara, usne jab iski virtual DOM prepare kari */}
+      {/* React ke liye tab dikkat aajati hai virtual DOM compare karna, ki iss li ko identify kaise kru, 
+      iss li ki identity kya hai ?, isko mai virtual DOM mei compare kaise karu ? 
+      Aise cases mei React poora <li> he render kar deta hai, in case agar tum kuch change kar raho ho toh */}
+      {/* Poora render kar kyu rahe ho ?  */}
+      {/* Islia koi bhi cheez jab tum map kar rahe hote ho, toh tumhe deni hoti hai key aur voh honi chahiye unique */}
+      {/* Aur dusri cheez ki index mat dena, kyuki agar maine arr mei kuch push kiya toh mere indices change hojayenge */}
+      {/* Because of this 
+      1. Giving key is important
+      2. Key should be unique
+      3. Key should be kept in link with item, means every item should've a unique id (you could've created array of objects)
+      4. Agar array mei kuch push ya pop nhi hora, then only you can use index as key */}
+      {/* Keys are used to uniquely identify that particular element, for making react able to compare it in virtual DOM
+      by telling react element's identity in virtual DOM */}
     </div>
   );
 }
