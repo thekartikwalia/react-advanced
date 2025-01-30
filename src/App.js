@@ -1,72 +1,31 @@
-import { useState, useCallback, useMemo } from "react";
+import { useContext } from "react"; 
+import AppContext from "./store/app-context";
 
-import Counter from "./components/Counter";
-import CounterButton from "./components/CounterButton";
-import SetCounter from "./components/SetCounter";
+// In case of high level apps, you're gonna have many multiple components 
+// Passing certain states or functions as props from app to multiple components is a very tedious task 
 
-// Instead of re-rendering whole JSX, react uses "Virtual DOM"
-// react maintains virtual DOM behind the scenes
-// react keeps 2 things with itself: old snapshot (real DOM) and virtual snapshot
-// react creates virtual snapshot via Component Tree Execution
-// As soon as page gets reloaded,
-// whereever react finds difference in it's virtual and real DOM, it updates that portion of DOM
-// React figures out state change with help of Virtual DOM
+// Maanlo tum kisi app pe kaam kar rahe ho jismei 10-15 components hain, bhot bda component tree hai 
+// Usmei tumhare paas kahin koi state defined hai, usse tumhe change karna hai kisi aur component mei 
+// That is actually alot of work for you, ki tum yahan se behjre ho fir vahan se aara hai wapis taaki usko parameters mil sake
+
+// Context yehi problme solve karta hai
+// Context kya karega na ki voh tumhari app ko wrap karlega 
+// Tum context mei kuch bhi define kar sakte ho, string, object, 
+// Even though tum is se link kar sakte ho ek state, aur uss state ko hanlde karte hue tum same cheez kar sakte ho
+// Toh tumhe zrurat he nhi pdegi ki yahan state define karo aur usko aage aage paas karo
+// Basically props ke through bhejne ki zrurat nhi pdegi, mai directly wrapped elements ke ander kahi se bhi state change kar paunga 
+// This feature is known as "CONTEXT API"
+
+// App() ke top pe context provide karna pdega 
+// App ke top pe kya hai index.js
+// wahan pe import karunga AppContext ko
 
 function App() {
-  console.log("APP RENDERED");
-  const [count, setCount] = useState(0);
+  const ctx = useContext(AppContext);
+  console.log(ctx);
+  // useContext is used to extract value of context created using createContext
 
-  const handleIncrement = useCallback(() => {
-    setCount((prev) => prev + 1);
-  }, []);
-
-  const handleDecrement = useCallback(() => {
-    setCount((prev) => prev - 1);
-  }, []);
-
-  const handleSetCount = (newCount) => {
-    setCount(newCount);
-  };
-
-  const arr = [1, 2, 3, 4];
-
-  return (
-    <div>
-      <Counter count={count} />
-      <CounterButton onButtonClick={handleIncrement}>Increase</CounterButton>
-      <CounterButton onButtonClick={handleDecrement}>Decrease</CounterButton>
-      <SetCounter onSet={handleSetCount} />
-      <SetCounter onSet={handleSetCount} />
-      {/* Dono setCounter ko set karne pe, count ki state change hori hai, but dono ki apni state hai */}
-      {/* Mai agar ek mei 0 ka 1 karunga, toh kya neche waale mei bhi 0 ka 1 hojayega kya ? 
-      Nahi hoga, iski state iski apni state hai, none of any other state */}
-
-      {/* Key point is even if i resuse the same component 2 times, snapshot of both will be different,
-      and react can figure it out all by itself */}
-
-      {/* But sometimes we need to tell react that how to figure out */}
-      <ul>
-        {arr.map((item, index) => (
-          <li key={item}>{item}</li>
-        ))}
-      </ul>
-      {/* This gives a warning (in case of absence of key) that each child should have a unique key prop */}
-      {/* Iska matlab hai react ko samajh nhi aaara, usne jab iski virtual DOM prepare kari */}
-      {/* React ke liye tab dikkat aajati hai virtual DOM compare karna, ki iss li ko identify kaise kru, 
-      iss li ki identity kya hai ?, isko mai virtual DOM mei compare kaise karu ? 
-      Aise cases mei React poora <li> he render kar deta hai, in case agar tum kuch change kar raho ho toh */}
-      {/* Poora render kar kyu rahe ho ?  */}
-      {/* Islia koi bhi cheez jab tum map kar rahe hote ho, toh tumhe deni hoti hai key aur voh honi chahiye unique */}
-      {/* Aur dusri cheez ki index mat dena, kyuki agar maine arr mei kuch push kiya toh mere indices change hojayenge */}
-      {/* Because of this 
-      1. Giving key is important
-      2. Key should be unique
-      3. Key should be kept in link with item, means every item should've a unique id (you could've created array of objects)
-      4. Agar array mei kuch push ya pop nhi hora, then only you can use index as key */}
-      {/* Keys are used to uniquely identify that particular element, for making react able to compare it in virtual DOM
-      by telling react element's identity in virtual DOM */}
-    </div>
-  );
+  return <h1>{ctx.message}</h1>
 }
 
 export default App;
