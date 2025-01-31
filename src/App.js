@@ -4,9 +4,6 @@ import Home from "./componentsForUseEffect/Home";
 
 import "./App.css";
 
-// Main chahta hun ki email ki length and password ki length greater than 5 ho, 
-// tohi mai login dbaunga, nahi toh mera button disabled rahe 
-
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 

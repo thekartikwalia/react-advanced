@@ -1,36 +1,46 @@
 import React, { useEffect, useState } from "react";
 
+// Let's now understand CLEANUP Function
+
+// Jaise he mai type kar raha hun, mere har keystroke pe "checking is form valid" chal ra hai
+// Mai chahta hun ki har key stroke pe na chle, jab user type kar raha hai toh usko type karne de
+// Jab uski typing ruk jaye, tab form valid check kare
+
+// Isko bolte hain DE-BOUNCING Effect (isko laane ke liye use hota hai useEffect hook)
+// ki mai itna fast fast apne state ko call nhi karna chahta
+// Mai chahta hun ki vo kuch break le 500ms ka aur fir yeh chale
+
+// Agar maine kuch multiple letters 500ms ke timeout ke ander likhe hain
+// Toh voh clear kardo 
+// Mai pichle wala timeout clear karna chahta hun 
+// Uske liye useEffect mei hota hai CLEANUP function
+
+// Har key stroke pe pichle key stroke ka timer clear karna pdega
+// CLEANUP function kya karta hai, har useEffect ke chalne se pehle
+// Pehle CLEANUP function chlta hai (Bss pehli baar cleanup nahi chlta)
+
+// Last mei sirf ek he timer bacha, jo maine last keystroke pe daala tha
+
 const Login = ({ onLogin }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // const [isFormValid, setIsFormValid] = useState(false);
-  // If form gets valid (lengths > 5), then enable the Login button
+  const [isFormValid, setIsFormValid] = useState(false);
 
-  // Mai karta hun ab Side-Effects introduce
-  // Ek application merko side-effect ka yeh dikha tha ki isFormValid state jo hai
-  // voh 2 states pe depend kar raha hai, and isko maine 2 onChnage handlers mei daal rakha hai
-  // Instead of this, mai isko as a side-effect daal sakta hun ki jab jab meri yeh dono states (email & password)
-  // change ho, tab isFormValid ko calculate karlo
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      console.log("Checking is form valid");
+      setIsFormValid(email.trim().length > 5 && password.trim().length > 5);
+    }, 500);
 
-  // useEffect(() => {
-  //   setIsFormValid(email.length > 5 && password.length > 5);
-  // }, [email, password]);
-  // Jab jab emaila ur password change hon tab tab yeh automatically run hojaye apne aap
-
-  // But kya merko isFormValid state banane ki zarurat thi ?
-  // Yeh depend toh sirf email aur password ki length pe kar raha hai
-  // Mai isko even state se bhi hata sakta hun kyuki yeh sirf email aur password state pe depend kar raha hai
-  // Jab jab emaila ur password change honge, tab mera ye component waise he re-render hoga
-  // Aur waise he re-render hoga toh mai isko as a variable bhi rakh sakta hun yahan pe
-  // Since yeh state pe he depend kar raha hai toh merko isko another state bnane ki zrurat he nahi hai
-
-  const isFormValid = email.length > 5 && password.length > 5;
-  // shi chlra kyuki email password hone pe waise he re-render hojayega component
-  // re-render hoga toh as a variable he daal lo
-
-  // Even side-effect mei nahi chahiye mujhe yahan pe
-  // Toh hook kabhi kabhi use nahi bhi karna hota
+    // CLEAN UP : Yeh aisa function hone wala hai 
+    // Jo pichla useEffect jab run hua tha, yeh us se pehle execute hojaye
+    // this gets called before execution of above piece of code (setTimeout) 
+    return () => {
+      console.log("CLEANUP");
+      clearTimeout(timeoutId);
+    };
+  }, [email, password]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -40,13 +50,11 @@ const Login = ({ onLogin }) => {
   const handleEmailChange = (e) => {
     const enteredEmail = e.target.value;
     setEmail(enteredEmail);
-    // setIsFormValid(enteredEmail.length > 5 && password.length > 5);
   };
 
   const handlePasswordChange = (e) => {
     const enteredPassword = e.target.value;
     setPassword(enteredPassword);
-    // setIsFormValid(enteredPassword.length > 5 && email.length > 5);
   };
 
   return (
